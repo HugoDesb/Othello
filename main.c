@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include "liste.h"
+#include <stdlib.h>
 
 #define TAILLE 8
 #define NBCASES 64
@@ -22,6 +23,9 @@ int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
 tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste);
 tpl coup_jouable(char playerColor);
 void change_othellier(int p,char c);
+tpl findEndPointsForFlipping(int point, char playerColor);
+tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,tpl liste );
+
 int humanInput();
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
 
@@ -120,6 +124,8 @@ void printGameWithHelp(char couleur){
 	}
 	printf("%d\n",TAILLE-1);
 }
+
+
 /**
  * Renvoie une liste chainée contenant les coordonnées des points dont la couleur
  * est J.
@@ -233,190 +239,105 @@ int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor){
 	return ret;
 } 
 
-void change_othellier(int p,char c){ //p est la case changee par le joueur c
-	char jj=c,ja;
-	int i,j,trouve,out,tmp,x,cpt;
-	if (jj=='N')ja='B'; else ja='N';
-	i=p/TAILLE;	//ligne de p		
-	j=p%TAILLE;	//colonne de p
-		
-	// vers la droite
-	if ((p+1)/TAILLE==i && othellier[i][j+1]==ja){
-			
-		trouve=0;
-		out=0;
-		tmp=p+2;
-		while(trouve==0 && out==0){
-				if (tmp/TAILLE!=i)
-					out=1;
-				else if (othellier[i][tmp%TAILLE]==jj){
-					trouve=1;	
-					}
-		tmp++;	
-		}
-		tmp--;
-		if (trouve){
-			for(x=tmp;x>=p;x--){
-				othellier[i][x%TAILLE]=c;		 
-			}		
-		}
-	}
-	// vers la gauche
-	if ((p-1)/TAILLE==i && othellier[i][j-1]==ja){
-			
-		trouve=0;
-		out=0;
-		tmp=p-2;
-		while(trouve==0 && out==0){
-				if (tmp/TAILLE!=i)
-					out=1;
-				else if (othellier[i][tmp%TAILLE]==jj){
-					trouve=1;	
-					}
-		tmp--;	
-		}
-		tmp++;
-		if (trouve){
-			for(x=tmp;x<=p;x++){
-				othellier[i][x%TAILLE]=c;		 
-			}		
-		}
-	}
-	// vers le haut
-	if ((p-TAILLE)>=0 && othellier[i-1][j]==ja){
-		trouve=0;
-		out=0;
+void change_othellier(int point,char playerColor){
+	int pointX = point/TAILLE,
+		  pointY = point%TAILLE,
+		  usePointX,
+		  usePointY,
+		  lambda,
+		  unityX,
+		  unityY,
+		  i;
 
-	tmp=p-(2*TAILLE);
-		while(trouve==0 && out==0){
-				if (tmp<0)
-					out=1;
-				else if (othellier[tmp/TAILLE][j]==jj){
-					trouve=1;
+	// TODOOOOOOOOOOOOO
+	tpl usableSpots = findEndPointsForFlipping(point,playerColor);
 
-					}
-		tmp-=TAILLE;	
-		}
-		tmp+=TAILLE;	
-		if (trouve){
-			for(x=tmp;x<=p;x=x+TAILLE){
-				othellier[x/TAILLE][j]=c;		 
-			}		
-		}
-	}
-	// vers le bas
-	if ((p+TAILLE)<NBCASES && othellier[i+1][j]==ja){
-		trouve=0;
-		out=0;
+	while(!est_vide(usableSpots)){
+		usePointX = tete_liste(usableSpots)/TAILLE;
+		usePointY = tete_liste(usableSpots)%TAILLE;
 
-		tmp=p+(2*TAILLE);
-		while(trouve==0 && out==0){
-				if (tmp<0)
-					out=1;
-				else if (othellier[tmp/TAILLE][j]==jj){
-					trouve=1;
+		//Calcul du lambda et du vecteur de direction
+		if(abs(usePointX) == abs(usePointY)){
+			lambda = abs(usePointX);
+			unityX = usePointX/lambda;
+			unityY = usePointY/lambda;
+		}else if(usePointX==0){
+			lambda = abs(usePointY);
+			unityX = 0;
+			unityY = usePointY/lambda;
+		}else if(usePointY==0){
+			lambda = abs(usePointX);
+			unityX = usePointX/lambda;
+			unityY = 0;
+		}
 
-					}
-		tmp-=TAILLE;	
-		}
-		tmp+=TAILLE;	
-		if (trouve){
-			for(x=tmp;x>=p;x=x-TAILLE){
-				othellier[x/TAILLE][j]=c;		 
-			}		
+		//On change tous les pions en partant du centre dans le direction donnée par
+		// le vecteur unity, lambda-1 fois
+		for(i=1; i<lambda;i++){
+			othellier[(i*unityX)+pointX][(i*unityY)+pointY] = playerColor;;
 		}
 	}
-	// diagonale haut droit
-	if ((p-TAILLE)>0 && (p-TAILLE+1)/TAILLE==i-1 && othellier[i-1][j+1]==ja){
-		trouve=0;
-		out=0;
-		cpt=i;
-		tmp=p-2*TAILLE+2;
-		while(trouve==0 && out==0){
-				if (((p-TAILLE)<0) && ((p+1)/TAILLE!=cpt-1))
-					out=1;
-				else if (othellier[tmp/TAILLE][tmp%TAILLE]==jj){
-					trouve=1;
-					}
-		tmp=tmp-TAILLE+1;
-		cpt--;	
-		}
-		tmp=tmp+TAILLE-1;
-		if(trouve){
-			for(x=tmp;x<=p;x=x+TAILLE-1){
-				othellier[x/TAILLE][x%TAILLE]=c;
-			}
-		}
-	}
-	// diagonale haut gauche
-	if ((p-TAILLE)>0 && (p-TAILLE-1)/TAILLE==i-1 && othellier[i-1][j-1]==ja){
-		trouve=0;
-		out=0;
-		cpt=i;
-		tmp=p-2*TAILLE-2;
-		while(trouve==0 && out==0){
-				if ((tmp<0) && (tmp/TAILLE!=cpt-1))
-					out=1;
-				else if (othellier[tmp/TAILLE][tmp%TAILLE]==jj){
-					trouve=1;
-					}
-		tmp=tmp-TAILLE-1;	
-		cpt--;
-		}
-		tmp=tmp+TAILLE+1;
-		if(trouve){
-			for(x=tmp;x<=p;x=x+TAILLE+1){
-				othellier[x/TAILLE][x%TAILLE]=c;
-			}
-		}
-	}
-	// diagonale bas gauche
-	if ((p+TAILLE)<NBCASES && (p+TAILLE-1)/TAILLE==i+1 && othellier[i+1][j-1]==ja){
-		trouve=0;
-		out=0;
-		cpt=i;
-		tmp=p+2*TAILLE-2;
-		while(trouve==0 && out==0){
-				if (((p+TAILLE)<NBCASES) && ((p-1)/TAILLE!=cpt+1))
-					out=1;
-				else if (othellier[tmp/TAILLE][tmp%TAILLE]==jj){
-					trouve=1;
-					}
-		tmp=tmp+TAILLE-1;
-		cpt++;	
-		}
-		tmp=tmp-TAILLE+1;
-		if(trouve){
-			for(x=tmp;x>=p;x=x-TAILLE+1){
-				othellier[x/TAILLE][x%TAILLE]=c;
-			}
-		}
-	}
-	// diagonale bas droit
-	if ((p+TAILLE)<NBCASES && (p+TAILLE+1)/TAILLE==i+1 && othellier[i+1][j+1]==ja){
-		trouve=0;
-		out=0;
-		cpt=i;
-		tmp=p+2*TAILLE+2;
-		while(trouve==0 && out==0){
-				if (((p+TAILLE)<NBCASES) && ((p+1)/TAILLE!=cpt+1))
-					out=1;
-				else if (othellier[tmp/TAILLE][tmp%TAILLE]==jj){
-					trouve=1;
-					}
-		tmp=tmp+TAILLE+1;	
-		cpt++;
-		}
-		tmp=tmp-TAILLE-1;
-		if(trouve){
-			for(x=tmp;x>=p;x=x-TAILLE-1){
-				othellier[x/TAILLE][x%TAILLE]=c;
-			}
-		}
-	}		
-
 }
+/**
+ * Explore in all directions if there is possible spots
+ * Add all of them into liste tpl.
+ * Returns the new list. 
+ */
+tpl findEndPointsForFlipping(int point, char playerColor){
+	tpl liste = cree_vide();;
+	liste = addEndPointIfPossibleInDirection(point, -1, -1 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point, -1,  0 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point, -1,  1 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point,  0, -1 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point,  0,  1 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point,  1, -1 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point,  1,  0 ,playerColor, liste);
+	liste = addEndPointIfPossibleInDirection(point,  1,  1 ,playerColor, liste);
+	return liste;
+}
+tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,tpl liste ){
 
+	int pointX = point/TAILLE,
+		  pointY = point%TAILLE,
+		  adversaryColorFound,
+		  out = 0;
+	
+	// détermine la couleur adverse
+	char adversaryColor = (playerColor == 'N') ? 'B' : 'N';
+
+	computeNextPoint(&pointX,&pointY, Dx, Dy);
+	while(!out){
+		//Condition d'arrêt : Sortis de l'othellier si les noueveaux points
+		//ne sont pas valides
+		if( ((0>pointX) || (pointX>=TAILLE)) || ((0>pointY) || (pointY>=TAILLE))){
+			out = 1;
+		}else{		
+			if(othellier[pointX][pointY] == playerColor){
+				//case couleur joueur
+				// Alors on peut retourner jusque la SSI coleur adverse trouvée
+				if(adversaryColorFound){
+					out = 1; 
+					liste = ajout_liste(pointX*TAILLE + pointY,liste);
+				}else{
+					out = 1;
+				}
+				out = 1; 
+				liste = ajout_liste(pointX*TAILLE + pointY,liste);
+			}else if(othellier[pointX][pointY] == adversaryColor){
+				//case couleur adverse
+				adversaryColorFound = 1;
+				
+				//continue
+				computeNextPoint(&pointX,&pointY, Dx, Dy);
+			}else{
+				//case vide
+				// on arrête la recherche 
+				out = 1;
+			}
+		}
+	}
+	return liste;
+}
 
 int humanInput(){
 	char letter, number;
