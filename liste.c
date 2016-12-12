@@ -24,28 +24,6 @@
 #include "liste.h"
 
 
-tpl cree_vide(void);
-int est_vide(tpl l);
-tpl ajout_liste(int val, tpl l);
-int tete_liste(tpl l);
-tpl queue_liste(tpl l);
-tpl creation_liste(tpl l);
-tpl creation_liste_ptr(tpl l);
-void afficher(tpl l);
-void afficher_liste(tpl l);
-int length(tpl l);
-int lengthWhile(tpl l);
-int length_ptr(tpl l);
-int lengthWhile_ptr(tpl l);
-tpl copie(tpl l);
-tpl searchFor(int x, tpl l);
-tpl copie_ptr(tpl l);
-tpl searchFor_ptr(int x, tpl l);
-tpl deleteFirst(int x, tpl l);
-tpl deleteAll(int x, tpl l);
-tpl copieInverse(tpl l);
-tpl copieInverse_ptr(tpl l);
-
 
 /**
  * Fonction qui affiche l'ensemble de la liste
@@ -211,6 +189,19 @@ tpl deleteAll(int x , tpl l){
 		free(l);
 	}
 	return ret;
+}
+
+/**
+ * Supprime la liste de la mémoire, renvoie la liste nulle
+ */
+tpl deleteList(tpl l){
+	if(est_vide(l)){
+		return l;
+	}else{
+		tpl lnext = queue_liste(l);
+		free(l);
+		return deleteList(lnext);
+	}
 }
 /**
  * Effectue une copie de la liste donnée en inversant l'ordre des valeurs

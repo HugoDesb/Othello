@@ -16,11 +16,12 @@ int main();
 void initialization();
 void printGame();
 void printGameWithHelp(char couleur);
-void cases_occupes(int T[],char J);
-void coup_jouable(int T[], int R[], char c);
+tpl cases_occupes(char playerColor);
+tpl coup_jouable(char playerColor);
 void change_othellier(int p,char c);
 int humanInput();
 tpl possibleForThisPoint(int point, char playerColor, tpl liste);
+
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
 int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
 tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste);
@@ -32,8 +33,10 @@ char othellier[TAILLE][TAILLE] ;
 int main(){
 	initialization();
 	while(1){
+		printf("Les noirs jouent.\n");
 		printGameWithHelp('N');
 		change_othellier(humanInput(),'N');
+		printf("Les blancs jouent.\n");
 		printGameWithHelp('B');
 		change_othellier(humanInput(),'B');
 	}
@@ -80,13 +83,12 @@ void printGame(){		//Affiche l'othellier
  */
 void printGameWithHelp(char couleur){
 	//On récupère les 
-	int casesOccuppees[NBCASES],coupsJouables[NBCASES];
-	cases_occupes(casesOccuppees,couleur);
-	coup_jouable(casesOccuppees,coupsJouables,couleur);
+	
+	tpl cases = coup_jouable(couleur);
 
 	
 	
-	int i,caseJouable,k;
+	int i;
 	//Affichage des num en haut
 	for(i=0; i<TAILLE;i++){
 		printf(" %c ",i+65);
@@ -108,15 +110,8 @@ void printGameWithHelp(char couleur){
 			printf(" %sB%s ",REDCOLOR,NORMALCOLOR);			
 		}else{
 			//Recherche si la case vide est jouable
-			k=0;
-			caseJouable=0;
-			while(!caseJouable && k<NBCASES){
-				if(coupsJouables[k]==i){
-					caseJouable = 1;
-				}
-				k++;
-			}
-			if(caseJouable){
+			tpl searchResult = searchFor(i, cases);
+			if(!est_vide(searchResult)){
 				printf(" %sV%s ",YELLOWCOLOR,NORMALCOLOR);
 			}else{
 				printf(" V ");
@@ -126,174 +121,35 @@ void printGameWithHelp(char couleur){
 	printf("%d\n",TAILLE-1);
 }
 /**
- * Le tableau T se remplis desnumeros de cases occupées par le joueur J
+ * Renvoie une liste chainée contenant les coordonnées des points dont la couleur
+ * est J.
  */
-void cases_occupes(int T[],char J){	//Le tableau T se remplis desnumeros de cases occupées par le joueur J   
-	int accu=0,i;
+tpl cases_occupes(char playerColor){	
+	tpl spots = cree_vide();
+	int i;
 	for(i=0; i<NBCASES;i++){
-		if(othellier[i/TAILLE][i%TAILLE]==J){
-			T[accu]=i;
-			accu++;
+		if(othellier[i/TAILLE][i%TAILLE]==playerColor){
+			spots = ajout_liste(i,spots);
 		}
 	}
-	for (i=accu;i<NBCASES;i++){
-		T[i]=-1;
-	}
-
-	printf("\n");
+	return spots;
 }
-void coup_jouable(int T[], int R[], char c){	//Le tableau R se remplis des positions ou le joueur désigné par c peut jouer 
-	char ja;
-	int i,j,p=0,trouve,out,tmp,accu=0,cpt;
-	
-	if (c=='N')ja='B'; else ja='N';
-	while(p<NBCASES && T[p]!=-1){
+/**
+ * Renvoie la liste chainée de tous les coups jouables pour la couleur donnée
+ */
+tpl coup_jouable(char playerColor){
+
+	tpl possibleSpots = cree_vide();
+	tpl occupiedSpots = cases_occupes(playerColor);
+
+	while(!est_vide(occupiedSpots)){
+		//On ajoute tous les coups possibles pour ce point là a la liste
+		possibleSpots = possibleForThisPoint(tete_liste(occupiedSpots), playerColor, possibleSpots);
 		
-		i=T[p]/TAILLE;	//ligne de p		
-		j=T[p]%TAILLE;	//colonne de p
-		
-		// vers la droite
-		if ((T[p]+1)/TAILLE==i && othellier[i][j+1]==ja){
-			
-			trouve=0;
-			out=0;
-			tmp=T[p]+2;
-			while(trouve==0 && out==0){
-					if (tmp/TAILLE!=i)
-						out=1;
-					else if (othellier[i][tmp%TAILLE]=='V'){
-						trouve=1;	
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp++;	
-			}	
-		}
-		//vers la gauche
-		if ((T[p]-1)/TAILLE==i && othellier[i][j-1]==ja){
-			trouve=0;
-			out=0;
-			tmp=T[p]-2;
-			while(trouve==0 && out==0){
-					if (tmp/TAILLE!=i)
-						out=1;
-					else if (othellier[i][tmp%TAILLE]=='V'){
-						trouve=1;	
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp--;	
-			}	
-		}
-		//vers le haut
-		if ((T[p]-TAILLE)>=0 && othellier[i-1][j]==ja){
-			trouve=0;
-			out=0;
-			tmp=T[p]-(2*TAILLE);
-			while(trouve==0 && out==0){
-					if (tmp<0)
-						out=1;
-					else if (othellier[tmp/TAILLE][j]=='V'){
-						trouve=1;	
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp-=TAILLE;	
-			}	
-		}
-		//vers le bas
-		if ((T[p]+TAILLE)<NBCASES && othellier[i+1][j]==ja){
-			trouve=0;
-			out=0;
-			tmp=T[p]+(2*TAILLE);
-			while(trouve==0 && out==0){
-					if (tmp>NBCASES)
-						out=1;
-					else if (othellier[tmp/TAILLE][j]=='V'){
-						trouve=1;	
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp+=TAILLE;	
-			}	
-		}
-		// diagonale haut droit
-		if ((T[p]-TAILLE)>0 && (T[p]-TAILLE+1)/TAILLE==i-1 && othellier[i-1][j+1]==ja){
-			trouve=0;
-			out=0;
-			cpt=i;
-			tmp=T[p]-2*TAILLE+2;
-			while(trouve==0 && out==0){
-					if (((T[p]-TAILLE)<0) && ((T[p]+1)/TAILLE!=cpt-1))
-						out=1;
-					else if (othellier[tmp/TAILLE][tmp%TAILLE]=='V'){
-						trouve=1;
-						R[accu]=tmp;
-						accu++;
-						}
-			cpt--;
-			tmp=tmp-TAILLE+1;	
-			}		
-		}
-		// diagonale haut gauche
-		if ((T[p]-TAILLE)>0 && (T[p]-TAILLE-1)/TAILLE==i-1 && othellier[i-1][j-1]==ja){
-			trouve=0;
-			out=0;
-			cpt=i;
-			tmp=T[p]-2*TAILLE-2;
-			while(trouve==0 && out==0){
-					if (((T[p]-TAILLE)<0) && ((T[p]-1)/TAILLE!=cpt-1))
-						out=1;
-					else if (othellier[tmp/TAILLE][tmp%TAILLE]=='V'){
-						trouve=1;
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp=tmp-TAILLE-1;	
-			cpt--;
-			}		
-		}
-		// diagonale bas droite
-		if ((T[p]+TAILLE)<NBCASES && (T[p]+TAILLE+1)/TAILLE==i+1 && othellier[i+1][j+1]==ja){
-			trouve=0;
-			out=0;
-			cpt=0;
-			tmp=T[p]+2*TAILLE+2;	
-			while(trouve==0 && out==0){
-					if (((T[p]+TAILLE)>NBCASES) && ((T[p]+1)/TAILLE!=cpt+1))
-						out=1;
-					else if (othellier[tmp/TAILLE][tmp%TAILLE]=='V'){
-						trouve=1;	
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp=tmp+TAILLE+1;
-			cpt++;	
-			}		
-		}
-		// diagonale bas gauche
-		if ((T[p]+TAILLE)<NBCASES && (T[p]+TAILLE-1)/TAILLE==i+1 && othellier[i+1][j-1]==ja){
-			trouve=0;
-			out=0;
-			tmp=T[p]+2*TAILLE-2;
-			while(trouve==0 && out==0){
-					if (((T[p]+TAILLE)>NBCASES) && ((T[p]-1)/TAILLE!=cpt+1))
-						out=1;
-					else if (othellier[tmp/TAILLE][tmp%TAILLE]=='V'){
-						trouve=1;
-						R[accu]=tmp;
-						accu++;
-						}
-			tmp=tmp+TAILLE-1;
-			cpt++;	
-			}		
-		}
+		occupiedSpots = queue_liste(occupiedSpots);
+	}
+	return possibleSpots;
 	
-	p++;
-	}
-	for(i=accu;i<NBCASES;i++){
-		R[i]=-1;
-	}
 }
 
 void change_othellier(int p,char c){ //p est la case changee par le joueur c
@@ -487,6 +343,9 @@ int humanInput(){
 		printf("azy donne ton choix laaa.\n");
 		scanf(" %c%c",&letter,&number);
 
+		printf("Letter : %d\n",letter-65);
+		printf("number : %d\n",number-48);
+		printf("Produit : %d\n",(number-48)*TAILLE + (letter-65));
 		fflush(stdin);
 		
 	}while((letter<65 ||letter>72) || (number<48 || number>56));
@@ -499,7 +358,7 @@ int humanInput(){
 /**
  * Explore in all directions if there is possible spots
  * Add all of them into liste tpl.
- * Return the new list. 
+ * Returns the new list. 
  */
 tpl possibleForThisPoint(int point, char playerColor, tpl liste){
 	liste = addIfPossibleInDirection(point, -1, -1 ,playerColor, liste);
