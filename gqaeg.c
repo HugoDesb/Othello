@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <malloc.h>
+#include "liste.h"
 
 #define TAILLE 8
 #define NBCASES 64
@@ -19,6 +20,10 @@ void cases_occupes(int T[],char J);
 void coup_jouable(int T[], int R[], char c);
 void change_othellier(int p,char c);
 int humanInput();
+tpl possibleForThisPoint(int point, char playerColor, tpl liste);
+void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
+int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
+tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste);
 
 char othellier[TAILLE][TAILLE] ;
 
@@ -120,7 +125,9 @@ void printGameWithHelp(char couleur){
 	}
 	printf("%d\n",TAILLE-1);
 }
-
+/**
+ * Le tableau T se remplis desnumeros de cases occupées par le joueur J
+ */
 void cases_occupes(int T[],char J){	//Le tableau T se remplis desnumeros de cases occupées par le joueur J   
 	int accu=0,i;
 	for(i=0; i<NBCASES;i++){
@@ -478,9 +485,105 @@ int humanInput(){
 	char letter, number;
 	do{
 		printf("azy donne ton choix laaa.\n");
-		scanf("%c%c",&letter,&number);
+		scanf(" %c%c",&letter,&number);
+
+		fflush(stdin);
+		
 	}while((letter<65 ||letter>72) || (number<48 || number>56));
 	
 	return ((number-48)*TAILLE + (letter-65));
+}
+
+
+
+/**
+ * Explore in all directions if there is possible spots
+ * Add all of them into liste tpl.
+ * Return the new list. 
+ */
+tpl possibleForThisPoint(int point, char playerColor, tpl liste){
+	liste = addIfPossibleInDirection(point, -1, -1 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point, -1,  0 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point, -1,  1 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point,  0, -1 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point,  0,  1 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point,  1, -1 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point,  1,  0 ,playerColor, liste);
+	liste = addIfPossibleInDirection(point,  1,  1 ,playerColor, liste);
+	return liste;
+}
+/**
+ * Ajoute a la liste des coups possibles si un coup possible est trouvé
+ * Sinon, ignoré.
+ */
+tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste){
+	int result = findIfPossibleInDirection(point, Dx, Dy,playerColor);
+	if(result != -1){
+		liste = ajout_liste(result,liste);
+	}
+	return liste;
+}
+
+/**
+ * Renvoie un point de l'othellier si, en partant du point donné,
+ * et en suivant une direction précise donnée, un coup est jouable
+ *
+ * Si un coup est jouable, la coordonné au format (int) est renvoyée,
+ * Sinon, -1 est renvoyé,
+ *
+ * Ici, les données fournies sont supposées valides ! Aucun contrôle n'est effectué
+ * préalablement (par exemple que la case de départ est bien de la couleur du joueur)
+ */
+int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor){
+	int pointX = point/TAILLE,
+		  pointY = point%TAILLE,
+  		adversaryColorFound = 0,
+		  out = 0,
+		  ret = -1;
+
+	// détermine la couleur adverse
+	char adversaryColor = (playerColor == 'N') ? 'B' : 'N';
+
+	computeNextPoint(&pointX,&pointY, Dx, Dy);
+	while(!out){
+		//Condition d'arrêt : Sortis de l'othellier si les noueveaux points
+		//ne sont pas valides
+		if( ((0>pointX) || (pointX>=TAILLE)) || ((0>pointY) || (pointY>=TAILLE))){
+			out = 1;
+		}else{		
+			if(othellier[pointX][pointY] == playerColor){
+				//case couleur joueur
+				//Quel que soit le cas, il n'y a aucun intérêt a chercher :
+				//   - Si il y a des B avant, alors il ne sera pas possible de jouer
+				//   - Si il n'y en a pas (c-a-d 2 N de suite), alors ça concerne un autre pion
+				out = 1;
+			}else if(othellier[pointX][pointY] == adversaryColor){
+				//case couleur adverse
+				adversaryColorFound = 1;
+				
+				//continue
+				computeNextPoint(&pointX,&pointY, Dx, Dy);
+			}else{
+				//case vide
+				if(adversaryColorFound){
+					ret = pointX*TAILLE + pointY;
+					out = 1;
+				}else{
+					//sortir
+					out = 1;		
+				}
+			}
+		}
+	}
+	return ret;
+} 
+
+/**
+ * Fonction qui recalcule les nouvelles coordonnées d'un point
+ * selon un décalage donnée par un vecteur
+ */
+void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy){
+	*pointX = *pointX + Dx;
+	*pointY = *pointY + Dy;
 }
 

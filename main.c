@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <malloc.h>
+#include "liste.h"
 
 #define TAILLE 8
 #define NBCASES 64
