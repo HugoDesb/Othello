@@ -16,7 +16,7 @@
 int main();
 void initialization();
 void printGame();
-void printGameWithHelp(char couleur);
+void printGameWithHelp(char couleur,tpl l);
 tpl cases_occupes(char playerColor);
 tpl possibleForThisPoint(int point, char playerColor, tpl liste);
 int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
@@ -24,7 +24,7 @@ tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl lis
 tpl coup_jouable(char playerColor);
 void change_othellier(int p,char c);
 void changeColorInDirection(int point,int Dx, int Dy,char playerColor);
-
+int askPlayer(tpl l);
 int humanInput();
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
 
@@ -35,13 +35,36 @@ char othellier[TAILLE][TAILLE] ;
 
 int main(){
 	initialization();
-	while(1){
-		printf("Les noirs jouent.\n");
-		printGameWithHelp('N');
-		change_othellier(humanInput(),'N');
-		printf("Les blancs jouent.\n");
-		printGameWithHelp('B');
-		change_othellier(humanInput(),'B');
+	int playerNok = 1,playerBok = 1;
+	int choix,count = 4;
+	tpl	choix_possibles;
+	while((playerNok || playerBok) && count<64){
+		playerNok = 1;
+		playerBok = 1;
+		choix_possibles = coup_jouable('N');
+		if(!est_vide(choix_possibles)){
+			printf("Les noirs jouent.\n");
+			printGameWithHelp('N',choix_possibles);
+			choix = askPlayer(choix_possibles);
+			change_othellier(choix,'N');
+			count++;
+		}else{
+			printf("Désolé !! Va crever !!");
+			playerNok = 0;
+		}
+
+		//Joueur Blanc
+		choix_possibles = coup_jouable('B');
+		if(!est_vide(choix_possibles)){
+			printf("Les blancs jouent.\n");
+			printGameWithHelp('B',choix_possibles);
+			choix = askPlayer(choix_possibles);
+			change_othellier(choix,'B');
+			count++;
+		}else{
+			printf("Désolé !! Va crever !!");
+			playerBok = 0;
+		}
 	}
 	
 	return 0;
@@ -84,11 +107,7 @@ void printGame(){		//Affiche l'othellier
  * Fonction qui affiche l'othellier avec les coups possibles
  * pour la couleur passé en paramêtre
  */
-void printGameWithHelp(char couleur){
-	//On récupère les cases jouables 
-	tpl cases = coup_jouable(couleur);
-
-	
+void printGameWithHelp(char couleur,tpl cases){
 	
 	int i;
 	//Affichage des num en haut
@@ -322,7 +341,14 @@ int humanInput(){
 	return ((number-48)*TAILLE + (letter-65));
 }
 
-
+int askPlayer(tpl choix_possibles){
+	int choix;
+	//on répète tant que le choix n'est pas dans ceux proposés
+	do{
+		choix= humanInput();
+	}while(est_vide(searchFor(choix,choix_possibles)));
+	return choix;
+}
 
 
 /**
