@@ -23,8 +23,7 @@ int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
 tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste);
 tpl coup_jouable(char playerColor);
 void change_othellier(int p,char c);
-tpl findEndPointsForFlipping(int point, char playerColor);
-tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,tpl liste );
+void changeColorInDirection(int point,int Dx, int Dy,char playerColor);
 
 int humanInput();
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
@@ -86,8 +85,7 @@ void printGame(){		//Affiche l'othellier
  * pour la couleur passé en paramêtre
  */
 void printGameWithHelp(char couleur){
-	//On récupère les 
-	
+	//On récupère les cases jouables 
 	tpl cases = coup_jouable(couleur);
 
 	
@@ -154,6 +152,7 @@ tpl coup_jouable(char playerColor){
 		
 		occupiedSpots = queue_liste(occupiedSpots);
 	}
+
 	return possibleSpots;
 	
 }
@@ -240,66 +239,24 @@ int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor){
 } 
 
 void change_othellier(int point,char playerColor){
-	int pointX = point/TAILLE,
-		  pointY = point%TAILLE,
-		  usePointX,
-		  usePointY,
-		  lambda,
-		  unityX,
-		  unityY,
-		  i;
-
-	// TODOOOOOOOOOOOOO
-	tpl usableSpots = findEndPointsForFlipping(point,playerColor);
-
-	while(!est_vide(usableSpots)){
-		usePointX = tete_liste(usableSpots)/TAILLE;
-		usePointY = tete_liste(usableSpots)%TAILLE;
-
-		//Calcul du lambda et du vecteur de direction
-		if(abs(usePointX) == abs(usePointY)){
-			lambda = abs(usePointX);
-			unityX = usePointX/lambda;
-			unityY = usePointY/lambda;
-		}else if(usePointX==0){
-			lambda = abs(usePointY);
-			unityX = 0;
-			unityY = usePointY/lambda;
-		}else if(usePointY==0){
-			lambda = abs(usePointX);
-			unityX = usePointX/lambda;
-			unityY = 0;
-		}
-
-		//On change tous les pions en partant du centre dans le direction donnée par
-		// le vecteur unity, lambda-1 fois
-		for(i=1; i<lambda;i++){
-			othellier[(i*unityX)+pointX][(i*unityY)+pointY] = playerColor;;
-		}
-	}
+	changeColorInDirection(point, -1, -1 ,playerColor);
+	changeColorInDirection(point, -1,  0 ,playerColor);
+	changeColorInDirection(point, -1,  1 ,playerColor);
+	changeColorInDirection(point,  0, -1 ,playerColor);
+	changeColorInDirection(point,  0,  1 ,playerColor);
+	changeColorInDirection(point,  1, -1 ,playerColor);
+	changeColorInDirection(point,  1,  0 ,playerColor);
+	changeColorInDirection(point,  1,  1 ,playerColor);
 }
 /**
- * Explore in all directions if there is possible spots
- * Add all of them into liste tpl.
- * Returns the new list. 
- */
-tpl findEndPointsForFlipping(int point, char playerColor){
-	tpl liste = cree_vide();;
-	liste = addEndPointIfPossibleInDirection(point, -1, -1 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point, -1,  0 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point, -1,  1 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point,  0, -1 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point,  0,  1 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point,  1, -1 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point,  1,  0 ,playerColor, liste);
-	liste = addEndPointIfPossibleInDirection(point,  1,  1 ,playerColor, liste);
-	return liste;
-}
-tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,tpl liste ){
+ * Cherche si un pion est utilisable pour retourner les pions jusq'au point d'origine
+ * En suivant la direction donnée.
+ */ 
+void  changeColorInDirection(int point,int Dx, int Dy,char playerColor){
 
 	int pointX = point/TAILLE,
 		  pointY = point%TAILLE,
-		  adversaryColorFound,
+		  adversaryColorFound = 0,
 		  out = 0;
 	
 	// détermine la couleur adverse
@@ -314,15 +271,24 @@ tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,t
 		}else{		
 			if(othellier[pointX][pointY] == playerColor){
 				//case couleur joueur
-				// Alors on peut retourner jusque la SSI coleur adverse trouvée
+				// Alors on peut 'flip' jusque la SSI couleur adverse trouvée
 				if(adversaryColorFound){
-					out = 1; 
-					liste = ajout_liste(pointX*TAILLE + pointY,liste);
+ 
+					//changement de l'othellier dans la direction inverse
+					out = 0;
+					computeNextPoint(&pointX,&pointY, -Dx, -Dy);
+					while(!out){
+						//le pt de départ est la 1ere case vide
+						if(othellier[pointX][pointY] == 'V'){
+							out = 1;
+						}
+						othellier[pointX][pointY] = playerColor;
+						computeNextPoint(&pointX,&pointY, -Dx, -Dy);
+					}
+					out = 1;
 				}else{
 					out = 1;
 				}
-				out = 1; 
-				liste = ajout_liste(pointX*TAILLE + pointY,liste);
 			}else if(othellier[pointX][pointY] == adversaryColor){
 				//case couleur adverse
 				adversaryColorFound = 1;
@@ -336,7 +302,8 @@ tpl addEndPointIfPossibleInDirection(int point,int Dx, int Dy,char playerColor,t
 			}
 		}
 	}
-	return liste;
+
+	
 }
 
 int humanInput(){
