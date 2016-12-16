@@ -5,5 +5,6 @@ Projet étudiant d'implémentation du jeu Othello en C
 Pour compiler : 
 
 ``` bash
-gcc -Wall main.c liste.c
+make
+./main
 ```
