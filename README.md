@@ -4,6 +4,6 @@ Projet étudiant d'implémentation du jeu Othello en C
 ## Utilisation 
 Pour compiler : 
 
-``` bash gab
+``` bash
 gcc -Wall main.c liste.c
 ```
