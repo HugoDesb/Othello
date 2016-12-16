@@ -16,7 +16,7 @@
 int main();
 void initialization();
 void printGame();
-void printGameWithHelp(char couleur,tpl l);
+void printGameWithHelp(tpl l);
 tpl cases_occupes(char playerColor);
 tpl possibleForThisPoint(int point, char playerColor, tpl liste);
 int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor);
@@ -27,7 +27,8 @@ void changeColorInDirection(int point,int Dx, int Dy,char playerColor);
 int askPlayer(tpl l);
 int humanInput();
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
-
+void playing();
+void endGame();
 
 char othellier[TAILLE][TAILLE] ;
 
@@ -35,38 +36,8 @@ char othellier[TAILLE][TAILLE] ;
 
 int main(){
 	initialization();
-	int playerNok = 1,playerBok = 1;
-	int choix,count = 4;
-	tpl	choix_possibles;
-	while((playerNok || playerBok) && count<64){
-		playerNok = 1;
-		playerBok = 1;
-		choix_possibles = coup_jouable('N');
-		if(!est_vide(choix_possibles)){
-			printf("Les noirs jouent.\n");
-			printGameWithHelp('N',choix_possibles);
-			choix = askPlayer(choix_possibles);
-			change_othellier(choix,'N');
-			count++;
-		}else{
-			printf("Désolé !! Va crever !!");
-			playerNok = 0;
-		}
-
-		//Joueur Blanc
-		choix_possibles = coup_jouable('B');
-		if(!est_vide(choix_possibles)){
-			printf("Les blancs jouent.\n");
-			printGameWithHelp('B',choix_possibles);
-			choix = askPlayer(choix_possibles);
-			change_othellier(choix,'B');
-			count++;
-		}else{
-			printf("Désolé !! Va crever !!");
-			playerBok = 0;
-		}
-	}
-	
+	playing();
+	endGame();
 	return 0;
 }
 
@@ -83,6 +54,40 @@ void initialization(){
 		}
 	}
 }
+
+void playing(){
+	int playerNok = 1,playerBok = 1;
+		int choix,count = 4;
+		tpl choix_possibles;
+		while((playerNok || playerBok) && count<64){
+			playerNok = 1;
+			playerBok = 1;
+			choix_possibles = coup_jouable('N');
+			if(!est_vide(choix_possibles)){
+				printf("Les noirs jouent.\n");
+				printGameWithHelp(choix_possibles);
+				choix = askPlayer(choix_possibles);
+				change_othellier(choix,'N');
+				count++;
+			}else{
+				printf("Désolé !! Va crever !!");
+				playerNok = 0;
+			}
+	
+			//Joueur Blanc
+			choix_possibles = coup_jouable('B');
+			if(!est_vide(choix_possibles)){
+				printf("Les blancs jouent.\n");
+				printGameWithHelp(choix_possibles);
+				choix = askPlayer(choix_possibles);
+				change_othellier(choix,'B');
+				count++;
+			}else{
+				printf("Désolé !! Va crever !!");
+				playerBok = 0;
+			}
+		}
+	}
 
 void printGame(){		//Affiche l'othellier
 	int i;
@@ -107,7 +112,7 @@ void printGame(){		//Affiche l'othellier
  * Fonction qui affiche l'othellier avec les coups possibles
  * pour la couleur passé en paramêtre
  */
-void printGameWithHelp(char couleur,tpl cases){
+void printGameWithHelp(tpl cases){
 	
 	int i;
 	//Affichage des num en haut
@@ -298,7 +303,7 @@ void  changeColorInDirection(int point,int Dx, int Dy,char playerColor){
 					computeNextPoint(&pointX,&pointY, -Dx, -Dy);
 					while(!out){
 						//le pt de départ est la 1ere case vide
-						if(othellier[pointX][pointY] == 'V'){
+						if((point/TAILLE==pointX) && (point%TAILLE==pointY)){
 							out = 1;
 						}
 						othellier[pointX][pointY] = playerColor;
@@ -360,3 +365,20 @@ void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy){
 	*pointY = *pointY + Dy;
 }
 
+void endGame(){
+	int scoreN,scoreB,i;
+	for (i=0;i<NBCASES;i++){
+		if (othellier[i/TAILLE][i%TAILLE]=='N')
+			scoreN++;
+		else if(othellier[i/TAILLE][i%TAILLE]=='B')
+			scoreB++;
+	}
+	printGameWithHelp(cree_vide());
+	
+	if (scoreN>scoreB)
+		printf("Les Noirs ont gagnés, BRAVO!!!!");
+	else if (scoreN<scoreB)
+		printf("Les Blancs ont gagnés, BRAVO!!!");
+	else printf ("Égalité...");
+	printf("\n");
+}
