@@ -8,7 +8,7 @@
  */ 
 
 /**
- * @author DESBIOLLES Hugo hugo.desbiolles@etu.univ-amu.fr>
+ * @author DESBIOLLES Hugo hugo.desbiolles@etu.univ-amu.fr, VILLA Gabriel gabriel.villa@etu.univ-amu.fr
  */
 
 
@@ -22,7 +22,6 @@
 #include <assert.h>
 #include <malloc.h>
 #include "liste.h"
-
 
 
 /**

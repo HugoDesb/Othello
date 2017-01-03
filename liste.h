@@ -1,7 +1,7 @@
 /**
  * -------------------------------------------------------------------
  * Nom du fichier : liste.h
- * @author  DESBIOLLES Hugo hugo.desbiolles@etu.univ-amu.fr>
+ * @author  DESBIOLLES Hugo hugo.desbiolles@etu.univ-amu.fr, VILLA Gabriel gabriel.villa@etu.univ-amu.fr
  * Objet : entete du module implantant une liste chainée d'entiers
  * --------------------------------------------------------------------
 */
@@ -9,7 +9,7 @@
 
 #ifndef LIST_H_INCLUDED
 #define LIST_H_INCLUDED
-/* ^^ these are the include guards */
+/*  these are the include guards */
 
 typedef struct list{
 	int val;
@@ -17,6 +17,8 @@ typedef struct list{
 } t_list, * tpl;
 
 /* Prototypes for the functions */
+
+
 /**
  * Renvoie le pointeur vide
  */
