@@ -29,12 +29,35 @@ void playing();
 void endGame();		
 
 char othellier[TAILLE][TAILLE] ;
+char othellier_test[TAILLE][TAILLE];
 
+void playingIA();
+int minimax (int depth,int maxdepth,char othellier[TAILLE][TAILLE]);
+int score(char Player_color,char othellier[TAILLE][TAILLE]);
 
 int main(){
-	initialization();
-	playing();
-	endGame();
+	int choix=-1;
+	initialization(); 
+	while (choix != 0){
+		printf("Choix du type de jeux:\n- 1 VS 1  (1)\n- 1 VS IA  (2)\n- IA VS IA  (3)\n - Quitter  (0)");
+		scanf(" %d",&choix);
+		fflush(stdin);
+		if (choix!=0){		
+			switch(choix){
+				case 1 :	
+					playing();
+					break;
+				case 2 :
+					playingIA();
+					break;
+				case 3 :
+					break;
+			//		playing2IA()
+			}
+		endGame();
+		}	
+	}
+
 	return 0;
 }
 
@@ -62,12 +85,12 @@ void playing(){
 		playerBok = 1;
 		
 			//Joueur Noir
-		choix_possibles = coup_jouable('N');
+		choix_possibles = coup_jouable('N',othellier);
 		if(!est_vide(choix_possibles)){
 			printf("Les noirs jouent.\n");
 			printGameWithHelp(choix_possibles);
 			choix = askPlayer(choix_possibles);
-			change_othellier(choix,'N');
+			change_othellier(choix,'N',othellier);
 			count++;
 		}else{
 			printf("Désolé, tu ne peux pas jouer!\n");
@@ -75,18 +98,126 @@ void playing(){
 		}
 	
 			//Joueur Blanc
-		choix_possibles = coup_jouable('B');
+		choix_possibles = coup_jouable('B',othellier);
 		if(!est_vide(choix_possibles)){
 			printf("Les blancs jouent.\n");
 			printGameWithHelp(choix_possibles);
 			choix = askPlayer(choix_possibles);
-			change_othellier(choix,'B');
+			change_othellier(choix,'B',othellier);
 			count++;
 		}else{
 			printf("Désolé, tu ne peux pas jouer!\n");
 			playerBok = 0;
 		}
 	}
+}
+
+void playingIA(){
+	int playerNok = 1,playerBok = 1;
+	int choix,count = 4;
+	tpl choix_possibles;
+	
+	while((playerNok || playerBok) && count<64){
+		playerNok = 1;
+		playerBok = 1;
+		
+			//Joueur Noir
+		choix_possibles = coup_jouable('N',othellier);
+		if(!est_vide(choix_possibles)){
+			printf("Les noirs jouent.\n");
+			printGameWithHelp(choix_possibles);
+			choix = askPlayer(choix_possibles);
+			change_othellier(choix,'N',othellier);
+			count++;
+		}else{
+			printf("Désolé, tu ne peux pas jouer!\n");
+			playerNok = 0;
+		}
+	
+			//Joueur Blanc
+		choix_possibles = coup_jouable('B',othellier);
+		if(!est_vide(choix_possibles)){
+			printf("Les blancs jouent.\n");
+	//Choix de l'ordi
+			
+			choix=minimax(4,4,othellier);		
+
+			change_othellier(choix,'B',othellier);
+			count++;
+		}else{
+			printf("L'ordinateur ne peux pas jouer!\n");
+			playerBok = 0;
+		}
+	}
+
+
+}
+
+int minimax (int depth,int maxdepth,char othellier[TAILLE][TAILLE])
+{
+	int i;
+
+
+	if (depth == 0)
+		return score('N',othellier);
+    
+	int bestScore;
+	int bestMove;
+  	int move;
+	tpl coups_jouable;
+	char nothellier[TAILLE][TAILLE];
+
+	for(i=0; i<NBCASES; i++){
+		nothellier[i/TAILLE][i%TAILLE] = othellier[i/TAILLE][i%TAILLE];
+	}
+
+  	if (depth%2 == 0){ //=Programme
+  		bestScore = -1000;
+		coups_jouable=coup_jouable('B',othellier);
+      		while(!est_vide(coups_jouable)){
+				  //new othellier (copy)
+				  //move on that 
+				  //
+				move=tete_liste(coups_jouable);
+       	//nouveau othellier 
+			change_othellier(move,'B',nothellier);
+			
+        		int score = minimax (depth - 1,maxdepth,nothellier);
+      	//free othellier
+         		if (score > bestScore) {
+            			bestScore = score;
+            			bestMove = move ;
+         		}
+      		}
+   	}else { //type MIN = adversaire
+      		bestScore = +1000;
+			  coups_jouable=coup_jouable('N',othellier);
+      		while(coups_jouable!=0){
+			move=tete_liste(coups_jouable);
+       	//nouveau othellier 
+			change_othellier(move,'N',nothellier);
+			
+        		int score = minimax (depth - 1,maxdepth,nothellier);
+      	//free othellier
+         		if (score < bestScore) {
+            			bestScore = score;
+            			bestMove = move ;
+         		}
+      		}
+   	}
+   	if (depth==maxdepth)
+		return bestMove;
+   	
+	return bestScore ;
+}
+
+int score(char Player_color,char othellier[TAILLE][TAILLE]){
+	int score=0,i;
+	for (i=0;i<NBCASES;i++){
+		if (othellier[i/TAILLE][i%TAILLE]==Player_color)
+			score++;
+	}
+	return score;
 }
 
 

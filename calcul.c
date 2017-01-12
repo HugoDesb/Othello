@@ -21,7 +21,7 @@ extern char othellier[TAILLE][TAILLE] ;
  * est désigné par le paramètre playerColor.
  */
 
-tpl cases_occupes(char playerColor){	
+tpl cases_occupes(char playerColor,char othellier[TAILLE][TAILLE]){	
 	tpl spots = cree_vide();
 	int i;
 	for(i=0; i<NBCASES;i++){
@@ -39,15 +39,15 @@ tpl cases_occupes(char playerColor){
  * Ajoute ces cases dans la liste tpl
  * Renvoie le nouvelle liste
  */
-tpl possibleForThisPoint(int point, char playerColor, tpl liste){
-	liste = addIfPossibleInDirection(point, -1, -1 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point, -1,  0 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point, -1,  1 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point,  0, -1 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point,  0,  1 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point,  1, -1 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point,  1,  0 ,playerColor, liste);
-	liste = addIfPossibleInDirection(point,  1,  1 ,playerColor, liste);
+tpl possibleForThisPoint(int point, char playerColor, tpl liste, char othellier[TAILLE][TAILLE]){
+	liste = addIfPossibleInDirection(point, -1, -1 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point, -1,  0 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point, -1,  1 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point,  0, -1 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point,  0,  1 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point,  1, -1 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point,  1,  0 ,playerColor, liste,othellier);
+	liste = addIfPossibleInDirection(point,  1,  1 ,playerColor, liste,othellier);
 	return liste;
 }
 
@@ -63,7 +63,7 @@ tpl possibleForThisPoint(int point, char playerColor, tpl liste){
  * Ici, les données fournies sont supposées valides ! Aucun contrôle n'est effectué
  * préalablement (par exemple que la case de départ est bien de la couleur du joueur)
  */
-int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor){
+int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor,char othellier[TAILLE][TAILLE]){
 	int pointX = point/TAILLE,
 		  pointY = point%TAILLE,
   		adversaryColorFound = 0,
@@ -113,8 +113,8 @@ int findIfPossibleInDirection(int point, int Dx, int Dy,char playerColor){
  * Ajoute a la liste des coups possibles si un coup possible est trouvé
  * Sinon, ignoré.
  */
-tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste){
-	int result = findIfPossibleInDirection(point, Dx, Dy,playerColor);
+tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl liste,char othellier[TAILLE][TAILLE]){
+	int result = findIfPossibleInDirection(point, Dx, Dy,playerColor,othellier);
 	if(result != -1){
 		liste = ajout_liste(result,liste);
 	}
@@ -125,14 +125,14 @@ tpl addIfPossibleInDirection(int point, int Dx, int Dy,char playerColor, tpl lis
 /**
  * Renvoie la liste chainée de tous les coups jouables pour la couleur donnée par le paramètre playerColor
  */
-tpl coup_jouable(char playerColor){
+tpl coup_jouable(char playerColor,char othellier[TAILLE][TAILLE]){
 
 	tpl possibleSpots = cree_vide();
-	tpl occupiedSpots = cases_occupes(playerColor);
+	tpl occupiedSpots = cases_occupes(playerColor,othellier);
 
 	while(!est_vide(occupiedSpots)){
 		//On ajoute tous les coups possibles pour ce point là a la liste
-		possibleSpots = possibleForThisPoint(tete_liste(occupiedSpots), playerColor, possibleSpots);
+		possibleSpots = possibleForThisPoint(tete_liste(occupiedSpots), playerColor, possibleSpots,othellier);
 		
 		occupiedSpots = queue_liste(occupiedSpots);
 	}
@@ -144,23 +144,22 @@ tpl coup_jouable(char playerColor){
 /**
  * A partir d'une case, teste dans les huit directions si ce coup change la couleur d'autres cases grace à la fonction changeColorInDirection
  */
-void change_othellier(int point,char playerColor){
-	changeColorInDirection(point, -1, -1 ,playerColor);
-	changeColorInDirection(point, -1,  0 ,playerColor);
-	changeColorInDirection(point, -1,  1 ,playerColor);
-	changeColorInDirection(point,  0, -1 ,playerColor);
-	changeColorInDirection(point,  0,  1 ,playerColor);
-	changeColorInDirection(point,  1, -1 ,playerColor);
-	changeColorInDirection(point,  1,  0 ,playerColor);
-	changeColorInDirection(point,  1,  1 ,playerColor);
+void change_othellier(int point,char playerColor,char othellier[TAILLE][TAILLE]){
+	changeColorInDirection(point, -1, -1 ,playerColor,othellier);
+	changeColorInDirection(point, -1,  0 ,playerColor,othellier);
+	changeColorInDirection(point, -1,  1 ,playerColor,othellier);
+	changeColorInDirection(point,  0, -1 ,playerColor,othellier);
+	changeColorInDirection(point,  0,  1 ,playerColor,othellier);
+	changeColorInDirection(point,  1, -1 ,playerColor,othellier);
+	changeColorInDirection(point,  1,  0 ,playerColor,othellier);
+	changeColorInDirection(point,  1,  1 ,playerColor,othellier);
 }
-
 
 /**
  * Cherche si un pion est utilisable pour retourner les pions jusq'au point d'origine
  * En suivant la direction donnée.
  */ 
-void  changeColorInDirection(int point,int Dx, int Dy,char playerColor){
+void  changeColorInDirection(int point,int Dx, int Dy,char playerColor,char othellier[TAILLE][TAILLE]){
 
 	int pointX = point/TAILLE,
 		  pointY = point%TAILLE,

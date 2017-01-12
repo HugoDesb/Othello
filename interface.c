@@ -37,13 +37,13 @@ void printGame(){
 	for(i=0; i<NBCASES;i++){
 		if(i%(TAILLE) == 0){
 			if (i!=0){
-				printf("%d",i/(TAILLE));
+				printf("%d",i/(TAILLE)-1);
 			}
 			printf("\n");		
 		}
 		printf(" %c ",othellier[i/TAILLE][i%TAILLE]);	
 	}
-	printf("%d\n",TAILLE);
+	printf("%d\n",TAILLE-1);
 }
 
 
@@ -62,7 +62,7 @@ void printGameWithHelp(tpl cases){
 	for(i=0; i<NBCASES;i++){
 		if(i%(TAILLE) == 0){
 			if (i!=0){
-				printf("%d",i/(TAILLE));
+				printf("%d",i/(TAILLE)-1);
 			}
 			printf("\n");		
 		}
@@ -83,7 +83,7 @@ void printGameWithHelp(tpl cases){
 			}
 		}
 	}
-	printf("%d\n",TAILLE);
+	printf("%d\n",TAILLE-1);
 }
 
 
@@ -111,8 +111,8 @@ int humanInput(){
 		scanf(" %c%c",&letter,&number);
 		fflush(stdin);
 		
-	}while((letter<65 ||letter>72) || (number<49 || number>57));
+	}while((letter<65 ||letter>72) || (number<48 || number>56));
 	
-	return ((number-49)*TAILLE + (letter-65));
+	return ((number-48)*TAILLE + (letter-65));
 }
 
