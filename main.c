@@ -32,7 +32,8 @@ char othellier[TAILLE][TAILLE] ;
 char othellier_test[TAILLE][TAILLE];
 
 void playingIA();
-int minimax (int depth,int maxdepth,char othellier[TAILLE][TAILLE]);
+int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE]);
+int minimax_adv (int depth,int maxdepth,char othellier[TAILLE][TAILLE]);
 int score(char Player_color,char othellier[TAILLE][TAILLE]);
 
 int main(){
@@ -139,8 +140,18 @@ void playingIA(){
 		if(!est_vide(choix_possibles)){
 			printf("Les blancs jouent.\n");
 	//Choix de l'ordi
+			//L'ordinateur peut jouer en : '
+			/*printf("L\'ordinateur peut jouer en : \n");
+			int e;
+			while(!est_vide(choix_possibles)){
+				e = tete_liste(choix_possibles);
+				printf("  -  %d : [%d][%d]\n",e, e/8,e%8);
+				choix_possibles = queue_liste(choix_possibles);
+			}*/
+			printf("l\'ordi joue : \n");
+		printf("	Possibilités : \n");
 			
-			choix=minimax(4,4,othellier);		
+			choix=minimax_ia(2,2,othellier);		
 
 			change_othellier(choix,'B',othellier);
 			count++;
@@ -152,9 +163,8 @@ void playingIA(){
 
 
 }
+int minimax_adv(int depth,int maxdepth,char othellier[TAILLE][TAILLE]){
 
-int minimax (int depth,int maxdepth,char othellier[TAILLE][TAILLE])
-{
 	int i;
 
 
@@ -162,49 +172,70 @@ int minimax (int depth,int maxdepth,char othellier[TAILLE][TAILLE])
 		return score('N',othellier);
     
 	int bestScore;
+  	int move;
+	tpl coups_jouable;
+
+	bestScore = +1000;
+	coups_jouable=coup_jouable('N',othellier);
+
+	while(coups_jouable!=0){
+
+		char nothellier[TAILLE][TAILLE];
+		for(i=0; i<NBCASES; i++){
+			nothellier[i/TAILLE][i%TAILLE] = othellier[i/TAILLE][i%TAILLE];
+		}
+		move=tete_liste(coups_jouable);
+
+		coups_jouable = queue_liste(coups_jouable);
+		//nouveau othellier 
+		change_othellier(move,'N',nothellier);
+		
+		int score = minimax_ia (depth - 1,maxdepth,nothellier);
+
+		//free othellier
+		if (score < bestScore) {
+				bestScore = score;
+				//bestMove = move ;
+		}
+	}
+	return bestScore ;	
+}
+int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE])
+{
+	int i;
+
+
+	if (depth == 0)
+		return score('B',othellier);
+    
+	int bestScore;
 	int bestMove;
   	int move;
 	tpl coups_jouable;
-	char nothellier[TAILLE][TAILLE];
 
-	for(i=0; i<NBCASES; i++){
-		nothellier[i/TAILLE][i%TAILLE] = othellier[i/TAILLE][i%TAILLE];
+	bestScore = -1000;
+	coups_jouable=coup_jouable('B',othellier);
+		
+	while(!est_vide(coups_jouable)){
+		//new othellier (copy)
+		char nothellier[TAILLE][TAILLE];
+		for(i=0; i<NBCASES; i++){
+			nothellier[i/TAILLE][i%TAILLE] = othellier[i/TAILLE][i%TAILLE];
+		}
+		//move on that 
+		move=tete_liste(coups_jouable);
+		coups_jouable = queue_liste(coups_jouable);
+		//nouveau othellier
+		change_othellier(move,'B',nothellier);
+		int score = minimax_adv(depth - 1,maxdepth,nothellier);
+
+		//free othellier
+		if (score > bestScore) {
+			bestScore = score;
+			bestMove = move ;
+		}
 	}
 
-  	if (depth%2 == 0){ //=Programme
-  		bestScore = -1000;
-		coups_jouable=coup_jouable('B',othellier);
-      		while(!est_vide(coups_jouable)){
-				  //new othellier (copy)
-				  //move on that 
-				  //
-				move=tete_liste(coups_jouable);
-       	//nouveau othellier 
-			change_othellier(move,'B',nothellier);
-			
-        		int score = minimax (depth - 1,maxdepth,nothellier);
-      	//free othellier
-         		if (score > bestScore) {
-            			bestScore = score;
-            			bestMove = move ;
-         		}
-      		}
-   	}else { //type MIN = adversaire
-      		bestScore = +1000;
-			  coups_jouable=coup_jouable('N',othellier);
-      		while(coups_jouable!=0){
-			move=tete_liste(coups_jouable);
-       	//nouveau othellier 
-			change_othellier(move,'N',nothellier);
-			
-        		int score = minimax (depth - 1,maxdepth,nothellier);
-      	//free othellier
-         		if (score < bestScore) {
-            			bestScore = score;
-            			bestMove = move ;
-         		}
-      		}
-   	}
    	if (depth==maxdepth)
 		return bestMove;
    	
