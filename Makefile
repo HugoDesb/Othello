@@ -7,8 +7,8 @@
 #--------------------------------------------------------------------
 
 
-main :	main.o liste.o interface.o calcul.o
-	gcc -o main main.o liste.o interface.o calcul.o
+main :	main.o liste.o interface.o calcul.o game.o ia.o
+	gcc -o main main.o liste.o interface.o calcul.o game.o ia.o
 
 main.o : main.c liste.h
 	gcc -o main.o -c main.c -Wall
@@ -21,6 +21,12 @@ interface.o : interface.c liste.h
 
 calcul.o : calcul.c liste.h
 	gcc -o calcul.o -c calcul.c -Wall
+
+game.o :  game.c liste.h interface.h
+	gcc -o game.o -c game.c -Wall
+
+ia.o :  ia.c liste.h 
+	gcc -o ia.o -c ia.c -Wall
 
 clean:
 	rm -rf *.o
