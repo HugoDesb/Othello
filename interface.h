@@ -40,4 +40,4 @@ int humanInput();
  /**
  * Demande la difficulé de l'IA (doit etre 1,2 ou 3)
  */
- int askIADifficulty(){}
+ int askIADifficulty();

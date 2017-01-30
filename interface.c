@@ -119,16 +119,16 @@ int humanInput(){
  */
  int askGameType(){
 	int choixJeu = 0;
-	while(choixIA>=0 && choixIA<=3){
+	do{
 		printf("Choix du type de jeux:\n- 1 VS 1  (1)\n- 1 VS IA  (2)\n- IA VS IA  (3)\n - Quitter  (0)");
 		scanf(" %d",&choixJeu);
 		fflush(stdin);
 
-		if(!(choixIA>=0 && choixIA<=3)){
+		if(choixJeu<0 && choixJeu>3){
 			printf("\n Attention votre choix n'est pas valide !\n");
 		}
 
-	}
+	}while(choixJeu<0 && choixJeu>3);
 	 return choixJeu;
  }
 
@@ -136,15 +136,15 @@ int humanInput(){
  * Demande la difficulé de l'IA (doit etre 1,2 ou 3)
  */
  int askIADifficulty(){
-	int choixIA = 1;
-	while(choixIA>=1 && choixIA<=3){
+	int choixIA = 0;
+	do{
 		printf("Difficulté ? \n - 1: Facile\n - 2: Moyen\n - 3: Difficile\n");
 		scanf(" %d",&choixIA);
 		fflush(stdin);
 
-		if(!(choixIA>=1 && choixIA<=3)){
+		if(choixIA<1 && choixIA>3){
 			printf("\n Attention votre choix n'est pas valide !\n");
 		}
-	}
+	}while(choixIA<1 && choixIA>3);
 	return choixIA;
  }
