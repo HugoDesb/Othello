@@ -23,7 +23,6 @@ int main();
 char othellier[TAILLE][TAILLE] ;
 
 int main(){
-	initialization(); 
 	jeu();
 	return 0;
 }
