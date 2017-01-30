@@ -42,7 +42,7 @@ int coeff_othellier[TAILLE][TAILLE] = {{ 500,-150,30,10,10,30,-150, 500},
  * depth DOIT être impair
  */
 int minimax_adv(int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,char player){
-	int i , bestScore , move,score;
+	int i , bestScore , move,nscore;
 	char opponent;
 	char copie_othellier[TAILLE][TAILLE];
 	tpl coups_jouable;
@@ -72,11 +72,10 @@ int minimax_adv(int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
 		//calcul du best score en utilisant la récusrion
 		// coté adversaire
 		opponent = getOpponent(player);
-		score = minimax_ia (depth - 1,maxdepth,copie_othellier,diff,opponent);
+		nscore = minimax_ia (depth - 1,maxdepth,copie_othellier,diff,opponent);
 
 		//Pour le minmax de l'adversaire, on récupère le score min 
-		if (score < bestScore) {
-				bestScore = score;
+		if (nscore < bestScore) {
 		}
 	}
 	//Dans le cadre de la récursion, on renvoie le score minimum
@@ -91,7 +90,7 @@ int minimax_adv(int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
  */
 int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,char player)
 {
-	int i , bestScore , bestMove , move,score ;
+	int i , bestScore , bestMove , move,nscore ;
 	char opponent;
 	char copie_othellier[TAILLE][TAILLE];
 	tpl coups_jouable;
@@ -123,11 +122,11 @@ int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
 		//calcul du best score en utilisant la récusrion
 		// coté adversaire
 		opponent = getOpponent(player);
-		score = minimax_adv(depth - 1,maxdepth,copie_othellier,diff,opponent );
+		nscore = minimax_adv(depth - 1,maxdepth,copie_othellier,diff,opponent );
 		//Pour le minmax du joueur, on récupère le score max 
 		// avec son coup associé
-		if (score > bestScore) {
-			bestScore = score;
+		if (nscore > bestScore) {
+			bestScore = nscore;
 			bestMove = move ;
 		}
 	}
@@ -146,16 +145,16 @@ int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
  * (si = 2 ou 3, prise en compte des coefficients)
  */
 int score(char Player_color,char othellier[TAILLE][TAILLE], int diff){
-	int score=0,i;
+	int nscore=0,i;
   
 	for (i=0;i<NBCASES;i++){
 		if (othellier[i/TAILLE][i%TAILLE]==Player_color){
 			if(diff==3 || diff == 2){
-				score+=coeff_othellier[i/TAILLE][i%TAILLE];
+				nscore+=coeff_othellier[i/TAILLE][i%TAILLE];
   	    	}else{
-  	    		score++;
+  	    		nscore++;
 			}		
 		}
 	}
-  return score;
+  return nscore;
 }
