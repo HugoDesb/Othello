@@ -14,4 +14,5 @@ void initialization();
 void jeu();
 void playing();
 void playingIA(int difficulte);
+void playing2IA(int difficulteIA1, int difficulteIA2);
 void endGame();

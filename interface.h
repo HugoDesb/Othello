@@ -31,3 +31,13 @@ int askPlayer(tpl l);
  * Gère la syntaxe de l'entrée donnée par le joueur
  */
 int humanInput();
+
+/**
+ * Demande le type de jeu (doit etre 1,2 ou 3)
+ */
+ int askGameType();
+
+ /**
+ * Demande la difficulé de l'IA (doit etre 1,2 ou 3)
+ */
+ int askIADifficulty(){}

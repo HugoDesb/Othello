@@ -28,6 +28,7 @@ void initialization();
 void jeu();
 void playing();
 void playingIA(int difficulte);
+void playing2IA(int difficulteIA1, int difficulteIA2);
 void endGame();
 
 
@@ -47,25 +48,25 @@ void initialization(){
 }
 
 void jeu(){
-    int choix=-1;
-	while (choix != 0){
-		printf("Choix du type de jeux:\n- 1 VS 1  (1)\n- 1 VS IA  (2)\n- IA VS IA  (3)\n - Quitter  (0)");
-		scanf(" %d",&choix);
-		fflush(stdin);
-		if (choix!=0){		
-			switch(choix){
+    int choixJeu=-1;
+	int choixIA1 = 0;
+	int choixIA2 = 0;
+	while (choixJeu != 0){
+		choixJeu = askGameType();
+		if (choixJeu!=0){		
+			switch(choixJeu){
 				case 1 :	
 					playing();
 					break;
 				case 2 :
-                    printf("Difficulté ? \n - 1: Facile\n - 2: Moyen\n - 3: Difficile\n");
-                    scanf(" %d",&choix);
-		            fflush(stdin);
-					playingIA(choix);
+                    choixIA1 = askIADifficulty();
+					playingIA(choixIA1);
 					break;
 				case 3 :
+					choixIA1 = askIADifficulty();
+					choixIA2 = askIADifficulty();
+					playing2IA(choixIA1,choixIA2);
 					break;
-			//		playing2IA()
 			}
 		endGame();
 		}	
@@ -154,6 +155,67 @@ void playingIA(int difficulte){
 			count++;
 		}else{
 			printf("L'ordinateur ne peux pas jouer!\n");
+			playerBok = 0;
+		}
+	}
+}
+
+void playing2IA(int difficulteIA1, int difficulteIA2){
+	int playerNok = 1,playerBok = 1,profondeurIA1 ,profondeurIA2 ,choix ,count=4;
+	tpl choix_possibles;
+
+	//Définition des paramètres des IA
+	switch(difficulteIA1){
+		case 1:
+			profondeurIA1 = 2;
+			break;
+		case 2: 
+			profondeurIA1 = 2;
+			break;
+		case 3 : 
+			profondeurIA1 = 4;
+			break;
+	}
+	switch(difficulteIA2){
+		case 1:
+			profondeurIA2 = 2;
+			break;
+		case 2: 
+			profondeurIA2 = 2;
+			break;
+		case 3 : 
+			profondeurIA2 = 4;
+			break;
+	}
+
+	
+	while((playerNok || playerBok) && count<64){
+		playerNok = 1;
+		playerBok = 1;
+		
+			//Joueur Noir
+		choix_possibles = coup_jouable('N',othellier);
+		if(!est_vide(choix_possibles)){
+			printf("Les noirs jouent.\n");
+			printGameWithHelp(choix_possibles);
+			choix=minimax_ia(profondeurIA1,profondeurIA1,othellier, difficulteIA1);
+			change_othellier(choix,'N',othellier);
+			count++;
+		}else{
+			printf("L'IA Noir ne peux pas jouer!\n");
+			playerNok = 0;
+		}
+	
+			//Joueur Blanc
+		choix_possibles = coup_jouable('B',othellier);
+		if(!est_vide(choix_possibles)){
+			printf("Les blancs jouent.\n");
+			printGameWithHelp(choix_possibles);
+			choix=minimax_ia(profondeurIA2,profondeurIA2,othellier, difficulteIA2);		
+			change_othellier(choix,'B',othellier);
+			count++;
+		}else{
+			printf("L'IA Blanc ne peux pas jouer!\n");
 			playerBok = 0;
 		}
 	}

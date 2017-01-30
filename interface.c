@@ -46,7 +46,6 @@ void printGame(){
 	printf("%d\n",TAILLE-1);
 }
 
-
 /**
  * Fonction qui affiche l'othellier avec les coups possibles
  * pour la couleur qui joue
@@ -86,7 +85,6 @@ void printGameWithHelp(tpl cases){
 	printf("%d\n",TAILLE-1);
 }
 
-
 /**
  * Demande au joueur la case ou celui-ci veut jouer et teste si le joueur a le droit de jouer à cet endroit
  */
@@ -116,3 +114,37 @@ int humanInput(){
 	return ((number-48)*TAILLE + (letter-65));
 }
 
+/**
+ * Demande le type de jeu (doit etre 1,2 ou 3)
+ */
+ int askGameType(){
+	int choixJeu = 0;
+	while(choixIA>=0 && choixIA<=3){
+		printf("Choix du type de jeux:\n- 1 VS 1  (1)\n- 1 VS IA  (2)\n- IA VS IA  (3)\n - Quitter  (0)");
+		scanf(" %d",&choixJeu);
+		fflush(stdin);
+
+		if(!(choixIA>=0 && choixIA<=3)){
+			printf("\n Attention votre choix n'est pas valide !\n");
+		}
+
+	}
+	 return choixJeu;
+ }
+
+/**
+ * Demande la difficulé de l'IA (doit etre 1,2 ou 3)
+ */
+ int askIADifficulty(){
+	int choixIA = 1;
+	while(choixIA>=1 && choixIA<=3){
+		printf("Difficulté ? \n - 1: Facile\n - 2: Moyen\n - 3: Difficile\n");
+		scanf(" %d",&choixIA);
+		fflush(stdin);
+
+		if(!(choixIA>=1 && choixIA<=3)){
+			printf("\n Attention votre choix n'est pas valide !\n");
+		}
+	}
+	return choixIA;
+ }
