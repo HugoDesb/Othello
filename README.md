@@ -2,9 +2,8 @@
 Projet étudiant d'implémentation du jeu Othello en C
 
 ## Utilisation 
-Pour compiler : 
+Pour compiler puis lancer: 
 
 ``` bash
-make
-./main
+make && ./main
 ```
