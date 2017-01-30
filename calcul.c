@@ -220,3 +220,14 @@ void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy){
 	*pointX = *pointX + Dx;
 	*pointY = *pointY + Dy;
 }
+
+/**
+ * Retourne la couleur de l'adversaire !! il faut envoyer 'N' ou 'B' !!
+ */
+ char getOpponent(char c){
+	if(player == 'N'){
+		return 'B';
+	}else{
+		return 'N';
+	}
+ }

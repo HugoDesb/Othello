@@ -64,3 +64,7 @@ void changeColorInDirection(int point,int Dx, int Dy,char playerColor,char othel
  */
 void computeNextPoint(int * pointX, int * pointY, int Dx, int Dy);
 
+/**
+ * Retourne la couleur de l'adversaire !! il faut envoyer 'N' ou 'B' !!
+ */
+ char getOpponent(char c);
