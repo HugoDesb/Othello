@@ -304,4 +304,4 @@ void endGame(){
         printf("%d à %d", scoreB, scoreN);
     }
 	printf("\nNouvelle Partie ! \n");
-}
+}	
