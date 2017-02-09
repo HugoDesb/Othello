@@ -159,6 +159,7 @@ void playingIA(int difficulte){
 			//choix humain
 			choix = askPlayer(choix_possibles);
 			change_othellier(choix,'N',othellier);
+
 			count++;
 		}else{
 			printf("Désolé, tu ne peux pas jouer!\n");

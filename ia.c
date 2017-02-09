@@ -76,6 +76,7 @@ int minimax_adv(int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
 
 		//Pour le minmax de l'adversaire, on récupère le score min 
 		if (nscore < bestScore) {
+			bestScore = nscore;
 		}
 	}
 	//Dans le cadre de la récursion, on renvoie le score minimum
@@ -125,7 +126,7 @@ int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
 		nscore = minimax_adv(depth - 1,maxdepth,copie_othellier,diff,opponent );
 		//Pour le minmax du joueur, on récupère le score max 
 		// avec son coup associé
-		if (nscore > bestScore) {
+		if (nscore >= bestScore) {
 			bestScore = nscore;
 			bestMove = move ;
 		}
@@ -133,6 +134,7 @@ int minimax_ia (int depth,int maxdepth,char othellier[TAILLE][TAILLE], int diff,
 
 	//On retourne le coup choisi
    	if (depth==maxdepth){
+		printf("Le joueur %c joue en %c%d \n\n",player,bestMove%TAILLE+65,bestMove/TAILLE);
         return bestMove;
     }  
 
