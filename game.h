@@ -5,6 +5,7 @@
 #include "interface.h"
 #include "calcul.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 
 #define TAILLE 8
@@ -39,3 +40,8 @@ void playing2IA(int difficulteIA1, int difficulteIA2);
  * Fonction qui affiche les scores et le gagnant
  */
 void endGame();
+
+/**
+ * For Demo
+ */
+ void jeuDemo();

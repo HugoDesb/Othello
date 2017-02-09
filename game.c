@@ -12,6 +12,7 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <assert.h>
 #include <malloc.h>
 #include "liste.h"
@@ -83,6 +84,31 @@ void jeu(){
 		}	
 	}
 }
+
+/**
+ * For Demo
+ */
+ void jeuDemo(){
+	 //d'abord comparer les IA (IA vs IA)
+	 // 1v2
+	 initialization();
+	 playing2IA(1,2);
+	 printf("IAvsIA : 1vs2 (NvsB)\n");
+	 endGame();
+	 sleep(5);
+	 // 2v3
+	 initialization();
+	 playing2IA(1,3);
+	 printf("IAvsIA : 2vs3 (NvsB)\n");
+	 endGame();
+	 sleep(5);
+	 // 1v3
+	 initialization();
+	 playing2IA(1,3);
+	 printf("IAvsIA : 1vs3 (NvsB)\n");
+	 endGame();
+	 sleep(5);
+ }
 
 /**
  * Fonction qui gère le déroulement du jeu pour 2 humains
@@ -213,6 +239,8 @@ void playing2IA(int difficulteIA1, int difficulteIA2){
 			profondeurIA2 = 4;
 			break;
 	}
+	printf("N : %d,%d\n",difficulteIA1,profondeurIA1);
+	printf("B : %d,%d\n",difficulteIA2,profondeurIA2);
 
 	//Boucle de jeu (conditions de fin de jeu)
 	while((playerNok || playerBok) && count<64){
@@ -223,12 +251,12 @@ void playing2IA(int difficulteIA1, int difficulteIA2){
 		choix_possibles = coup_jouable('N',othellier);
 		if(!est_vide(choix_possibles)){
 			printf("Les noirs jouent.\n");
-			printGameWithHelp(choix_possibles);
+			//printGameWithHelp(choix_possibles);
 			choix=minimax_ia(profondeurIA1,profondeurIA1,othellier, difficulteIA1,'N');
 			change_othellier(choix,'N',othellier);
 			count++;
 		}else{
-			printf("L'IA Noir ne peux pas jouer!\n");
+			printf("L'IA Noir ne peux pas jouer!\n");	
 			playerNok = 0;
 		}
 	
@@ -236,7 +264,7 @@ void playing2IA(int difficulteIA1, int difficulteIA2){
 		choix_possibles = coup_jouable('B',othellier);
 		if(!est_vide(choix_possibles)){
 			printf("Les blancs jouent.\n");
-			printGameWithHelp(choix_possibles);
+			//printGameWithHelp(choix_possibles);
 			choix=minimax_ia(profondeurIA2,profondeurIA2,othellier, difficulteIA2,'B');		
 			change_othellier(choix,'B',othellier);
 			count++;
