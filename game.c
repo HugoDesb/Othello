@@ -165,7 +165,7 @@ void playingIA(int difficulte){
 			printf("Désolé, tu ne peux pas jouer!\n");
 			playerNok = 0;
 		}
-	
+		
 			//Joueur Blanc
 		choix_possibles = coup_jouable('B',othellier);
 		if(!est_vide(choix_possibles)){
@@ -186,7 +186,7 @@ void playingIA(int difficulte){
  * Fonction qui gère le déroulement du jeu pour 2 IA
  */
 void playing2IA(int difficulteIA1, int difficulteIA2){
-	int playerNok = 1,playerBok = 1,profondeurIA1 ,profondeurIA2 ,choix ,count=4;
+	int playerNok = 1,playerBok = 1,profondeurIA1 ,profondeurIA2 ,choix ,count=4,wait;
 	tpl choix_possibles;
 
 	//Définition des paramètres des IA
@@ -232,7 +232,7 @@ void playing2IA(int difficulteIA1, int difficulteIA2){
 			printf("L'IA Noir ne peux pas jouer!\n");
 			playerNok = 0;
 		}
-	
+		scanf("%d",&wait);
 			//Joueur Blanc
 		choix_possibles = coup_jouable('B',othellier);
 		if(!est_vide(choix_possibles)){
@@ -245,6 +245,7 @@ void playing2IA(int difficulteIA1, int difficulteIA2){
 			printf("L'IA Blanc ne peux pas jouer!\n");
 			playerBok = 0;
 		}
+		scanf("%d",&wait);
 	}
 }
 
